@@ -196,19 +196,19 @@ class DataScreen(MDScreen):
                 row_data.append((str(i), f"{r[1]} Ekor", f"Rp {r[2]:,}"))
         else:
             # Load pengeluaran
-            # Total width expanded to make table full-width (225dp proportion)
             column_data = [
-                ("No", dp(25)),
-                ("Produk", dp(80)),
-                ("Kategori", dp(60)),
-                ("Nominal", dp(60))
+                ("No", dp(20)),
+                ("Produk", dp(70)),
+                ("Kategori", dp(50)),
+                ("Nominal", dp(50)),
+                ("Jumlah", dp(35))
             ]
             rows = database.get_all_pengeluaran()
             row_data = []
             for i, r in enumerate(rows, start=1):
-                # r = (id, produk, kategori, nominal, tanggal)
+                # r = (id, produk, kategori, nominal, jumlah, tanggal)
                 self.current_ids.append(r[0])
-                row_data.append((str(i), str(r[1]), str(r[2]), f"Rp {r[3]:,}"))
+                row_data.append((str(i), str(r[1]), str(r[2]), f"Rp {r[3]:,}", f"{r[4]} Pcs"))
 
         self.table = MDDataTable(
             use_pagination=True,
@@ -252,11 +252,13 @@ class DataScreen(MDScreen):
             self.add_field1 = MDTextField(hint_text="Nama Produk", mode="rectangle")
             self.add_field2 = MDTextField(hint_text="Kategori (Pakan, Susu, dll)", mode="rectangle")
             self.add_field3 = MDTextField(hint_text="Nominal (Rp)", input_filter="int", mode="rectangle")
+            self.add_field4 = MDTextField(hint_text="Jumlah", input_filter="int", mode="rectangle", text="1")
             
-            content = BoxLayout(orientation="vertical", size_hint_y=None, height="195dp", spacing="10dp")
+            content = BoxLayout(orientation="vertical", size_hint_y=None, height="260dp", spacing="10dp")
             content.add_widget(self.add_field1)
             content.add_widget(self.add_field2)
             content.add_widget(self.add_field3)
+            content.add_widget(self.add_field4)
             
             self.dialog = MDDialog(
                 title="Input Pengeluaran Baru",
@@ -281,8 +283,10 @@ class DataScreen(MDScreen):
         val1 = self.add_field1.text.strip()
         val2 = self.add_field2.text.strip()
         val3 = self.add_field3.text.strip()
+        val4 = self.add_field4.text.strip()
         if val1 and val2 and val3:
-            database.add_pengeluaran(val1, val2, int(val3))
+            qty = int(val4) if val4 else 1
+            database.add_pengeluaran(val1, val2, int(val3), qty)
             self.dialog.dismiss()
             self.trigger_loading()
 
@@ -315,7 +319,7 @@ class DataScreen(MDScreen):
                 ]
             )
         else:
-            c.execute("SELECT produk, kategori, nominal FROM pengeluaran WHERE id=?", (db_id,))
+            c.execute("SELECT produk, kategori, nominal, jumlah FROM pengeluaran WHERE id=?", (db_id,))
             row = c.fetchone()
             conn.close()
             if not row: return
@@ -323,11 +327,13 @@ class DataScreen(MDScreen):
             self.edit_field1 = MDTextField(text=str(row[0]), hint_text="Nama Produk", mode="rectangle")
             self.edit_field2 = MDTextField(text=str(row[1]), hint_text="Kategori (Pakan, Susu, dll)", mode="rectangle")
             self.edit_field3 = MDTextField(text=str(row[2]), hint_text="Nominal (Rp)", input_filter="int", mode="rectangle")
+            self.edit_field4 = MDTextField(text=str(row[3]), hint_text="Jumlah", input_filter="int", mode="rectangle")
             
-            content = BoxLayout(orientation="vertical", size_hint_y=None, height="195dp", spacing="10dp")
+            content = BoxLayout(orientation="vertical", size_hint_y=None, height="260dp", spacing="10dp")
             content.add_widget(self.edit_field1)
             content.add_widget(self.edit_field2)
             content.add_widget(self.edit_field3)
+            content.add_widget(self.edit_field4)
             
             self.dialog = MDDialog(
                 title="Edit Pengeluaran",
@@ -353,8 +359,10 @@ class DataScreen(MDScreen):
         val1 = self.edit_field1.text.strip()
         val2 = self.edit_field2.text.strip()
         val3 = self.edit_field3.text.strip()
+        val4 = self.edit_field4.text.strip()
         if val1 and val2 and val3:
-            database.update_pengeluaran(self.temp_edit_id, val1, val2, int(val3))
+            qty = int(val4) if val4 else 1
+            database.update_pengeluaran(self.temp_edit_id, val1, val2, int(val3), qty)
             self.dialog.dismiss()
             self.trigger_loading()
 

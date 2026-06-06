@@ -37,6 +37,27 @@ KV_VIEWS = '''
             left_action_items: [["arrow-left", lambda x: app.back_to_main()]]
             
         MDBoxLayout:
+            size_hint_y: None
+            height: "50dp"
+            orientation: 'horizontal'
+            padding: ["16dp", "4dp", "16dp", "4dp"]
+            spacing: "10dp"
+            
+            MDRaisedButton:
+                id: btn_month
+                text: "Semua Bulan"
+                size_hint_x: 0.5
+                md_bg_color: 0.12, 0.45, 0.12, 1
+                on_release: root.open_month_menu()
+                
+            MDRaisedButton:
+                id: btn_year
+                text: "Semua Tahun"
+                size_hint_x: 0.5
+                md_bg_color: 0.12, 0.45, 0.12, 1
+                on_release: root.open_year_menu()
+                
+        MDBoxLayout:
             id: table_container
             orientation: 'vertical'
             padding: "16dp"
@@ -79,6 +100,26 @@ KV_VIEWS = '''
                     on_release: root.open_account_menu()
                     
             MDBoxLayout:
+                size_hint_y: None
+                height: "50dp"
+                orientation: 'horizontal'
+                spacing: "10dp"
+                
+                MDRaisedButton:
+                    id: btn_month
+                    text: "Semua Bulan"
+                    size_hint_x: 0.5
+                    md_bg_color: 0.12, 0.45, 0.12, 1
+                    on_release: root.open_month_menu()
+                    
+                MDRaisedButton:
+                    id: btn_year
+                    text: "Semua Tahun"
+                    size_hint_x: 0.5
+                    md_bg_color: 0.12, 0.45, 0.12, 1
+                    on_release: root.open_year_menu()
+                    
+            MDBoxLayout:
                 id: table_container
                 orientation: 'vertical'
                 radius: 12
@@ -102,15 +143,35 @@ KV_VIEWS = '''
             spacing: "12dp"
             
             MDBoxLayout:
+                size_hint_y: None
+                height: "50dp"
+                orientation: 'horizontal'
+                spacing: "10dp"
+                
+                MDRaisedButton:
+                    id: btn_month
+                    text: "Semua Bulan"
+                    size_hint_x: 0.5
+                    md_bg_color: 0.12, 0.45, 0.12, 1
+                    on_release: root.open_month_menu()
+                    
+                MDRaisedButton:
+                    id: btn_year
+                    text: "Semua Tahun"
+                    size_hint_x: 0.5
+                    md_bg_color: 0.12, 0.45, 0.12, 1
+                    on_release: root.open_year_menu()
+                    
+            MDBoxLayout:
                 id: table_container
                 orientation: 'vertical'
-                size_hint_y: 0.75
+                size_hint_y: 0.65
                 radius: 12
                 md_bg_color: 1, 1, 1, 1
                 padding: "4dp"
                 
             MDCard:
-                size_hint_y: 0.25
+                size_hint_y: 0.35
                 padding: "16dp"
                 radius: 12
                 md_bg_color: 0.12, 0.45, 0.12, 0.08
@@ -164,6 +225,27 @@ KV_VIEWS = '''
             elevation: 4
             left_action_items: [["arrow-left", lambda x: app.back_to_main()]]
             
+        MDBoxLayout:
+            size_hint_y: None
+            height: "50dp"
+            orientation: 'horizontal'
+            padding: ["20dp", "4dp", "20dp", "4dp"]
+            spacing: "10dp"
+            
+            MDRaisedButton:
+                id: btn_month
+                text: "Semua Bulan"
+                size_hint_x: 0.5
+                md_bg_color: 0.12, 0.45, 0.12, 1
+                on_release: root.open_month_menu()
+                
+            MDRaisedButton:
+                id: btn_year
+                text: "Semua Tahun"
+                size_hint_x: 0.5
+                md_bg_color: 0.12, 0.45, 0.12, 1
+                on_release: root.open_year_menu()
+                
         ScrollView:
             MDBoxLayout:
                 orientation: 'vertical'
@@ -173,12 +255,12 @@ KV_VIEWS = '''
                 
                 MDCard:
                     size_hint_y: None
-                    height: "380dp"
+                    height: "700dp"
                     padding: "20dp"
                     radius: 15
                     elevation: 2
                     orientation: 'vertical'
-                    spacing: "12dp"
+                    spacing: "8dp"
                     md_bg_color: 1, 1, 1, 1
                     
                     MDLabel:
@@ -211,6 +293,69 @@ KV_VIEWS = '''
                             halign: "right"
                             
                     MDSeparator:
+
+                    # Harga Pokok Penjualan (HPP)
+                    MDLabel:
+                        text: "HARGA POKOK PENJUALAN (HPP)"
+                        bold: True
+                        font_style: "Subtitle2"
+                        theme_text_color: "Custom"
+                        text_color: 0.8, 0.4, 0.0, 1
+                        
+                    MDBoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "25dp"
+                        MDLabel:
+                            text: "  Harga Pokok Penjualan Sapi"
+                        MDLabel:
+                            id: lbl_hpp_sapi
+                            text: "Rp 0"
+                            halign: "right"
+
+                    MDBoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "25dp"
+                        MDLabel:
+                            text: "  Beban Transportasi Pembelian"
+                        MDLabel:
+                            id: lbl_beban_transport
+                            text: "Rp 0"
+                            halign: "right"
+
+                    MDBoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "30dp"
+                        MDLabel:
+                            text: "TOTAL HPP:"
+                            bold: True
+                        MDLabel:
+                            id: lbl_total_hpp
+                            text: "Rp 0"
+                            bold: True
+                            halign: "right"
+                            
+                    MDSeparator:
+
+                    # Laba Kotor
+                    MDBoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "30dp"
+                        MDLabel:
+                            text: "LABA KOTOR:"
+                            bold: True
+                        MDLabel:
+                            id: lbl_laba_kotor
+                            text: "Rp 0"
+                            bold: True
+                            halign: "right"
+                            theme_text_color: "Custom"
+                            text_color: 0.12, 0.45, 0.12, 1
+
+                    MDSeparator:
                     
                     # Expense
                     MDLabel:
@@ -239,6 +384,39 @@ KV_VIEWS = '''
                             text: "  Beban Kesehatan Ternak"
                         MDLabel:
                             id: lbl_beban_kesehatan
+                            text: "Rp 0"
+                            halign: "right"
+
+                    MDBoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "25dp"
+                        MDLabel:
+                            text: "  Beban Gaji"
+                        MDLabel:
+                            id: lbl_beban_gaji
+                            text: "Rp 0"
+                            halign: "right"
+
+                    MDBoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "25dp"
+                        MDLabel:
+                            text: "  Beban Listrik & Air Kandang"
+                        MDLabel:
+                            id: lbl_beban_listrik
+                            text: "Rp 0"
+                            halign: "right"
+
+                    MDBoxLayout:
+                        orientation: 'horizontal'
+                        size_hint_y: None
+                        height: "25dp"
+                        MDLabel:
+                            text: "  Beban Penyusutan Kandang & Alat"
+                        MDLabel:
+                            id: lbl_beban_penyusutan
                             text: "Rp 0"
                             halign: "right"
                             
@@ -274,7 +452,7 @@ KV_VIEWS = '''
                         size_hint_y: None
                         height: "40dp"
                         MDLabel:
-                            text: "LABA BERSIH:"
+                            text: "LABA RUGI BERSIH:"
                             bold: True
                             font_style: "H6"
                         MDLabel:
@@ -310,7 +488,69 @@ class DaftarAkunScreen(MDScreen):
 
 
 class JurnalUmumScreen(MDScreen):
+    selected_month = "Semua"
+    selected_year = "Semua"
+    month_menu = None
+    year_menu = None
+
     def on_enter(self):
+        self.load_journal()
+
+    def open_month_menu(self):
+        months = [
+            ("Semua", "Semua Bulan"), ("01", "Januari"), ("02", "Februari"), ("03", "Maret"),
+            ("04", "April"), ("05", "Mei"), ("06", "Juni"), ("07", "Juli"),
+            ("08", "Agustus"), ("09", "September"), ("10", "Oktober"), ("11", "November"),
+            ("12", "Desember")
+        ]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": text,
+                "on_release": lambda m_val=val, m_text=text: self.set_month(m_val, m_text),
+            } for val, text in months
+        ]
+        self.month_menu = MDDropdownMenu(
+            caller=self.ids.btn_month,
+            items=menu_items,
+            width=dp(180),
+        )
+        self.month_menu.open()
+
+    def set_month(self, val, text):
+        self.selected_month = val
+        self.ids.btn_month.text = text
+        if self.month_menu:
+            self.month_menu.dismiss()
+        self.load_journal()
+
+    def open_year_menu(self):
+        years = [
+            ("Semua", "Semua Tahun"), ("2026", "2026"), ("2027", "2027"),
+            ("2028", "2028"), ("2029", "2029")
+        ]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": text,
+                "on_release": lambda y_val=val, y_text=text: self.set_year(y_val, y_text),
+            } for val, text in years
+        ]
+        self.year_menu = MDDropdownMenu(
+            caller=self.ids.btn_year,
+            items=menu_items,
+            width=dp(180),
+        )
+        self.year_menu.open()
+
+    def set_year(self, val, text):
+        self.selected_year = val
+        self.ids.btn_year.text = text
+        if self.year_menu:
+            self.year_menu.dismiss()
+        self.load_journal()
+
+    def load_journal(self):
         container = self.ids.table_container
         container.clear_widgets()
         column_data = [
@@ -320,7 +560,7 @@ class JurnalUmumScreen(MDScreen):
             ("Debit", dp(16)),
             ("Kredit", dp(16))
         ]
-        rows = database.get_jurnal_umum()
+        rows = database.get_jurnal_umum(self.selected_month, self.selected_year)
         table = MDDataTable(
             use_pagination=True,
             rows_num=10,
@@ -334,6 +574,10 @@ class JurnalUmumScreen(MDScreen):
 class BukuBesarScreen(MDScreen):
     menu = None
     selected_code = "101"
+    selected_month = "Semua"
+    selected_year = "Semua"
+    month_menu = None
+    year_menu = None
 
     def on_enter(self):
         self.load_ledger()
@@ -361,6 +605,60 @@ class BukuBesarScreen(MDScreen):
             self.menu.dismiss()
         self.load_ledger()
 
+    def open_month_menu(self):
+        months = [
+            ("Semua", "Semua Bulan"), ("01", "Januari"), ("02", "Februari"), ("03", "Maret"),
+            ("04", "April"), ("05", "Mei"), ("06", "Juni"), ("07", "Juli"),
+            ("08", "Agustus"), ("09", "September"), ("10", "Oktober"), ("11", "November"),
+            ("12", "Desember")
+        ]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": text,
+                "on_release": lambda m_val=val, m_text=text: self.set_month(m_val, m_text),
+            } for val, text in months
+        ]
+        self.month_menu = MDDropdownMenu(
+            caller=self.ids.btn_month,
+            items=menu_items,
+            width=dp(180),
+        )
+        self.month_menu.open()
+
+    def set_month(self, val, text):
+        self.selected_month = val
+        self.ids.btn_month.text = text
+        if self.month_menu:
+            self.month_menu.dismiss()
+        self.load_ledger()
+
+    def open_year_menu(self):
+        years = [
+            ("Semua", "Semua Tahun"), ("2026", "2026"), ("2027", "2027"),
+            ("2028", "2028"), ("2029", "2029")
+        ]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": text,
+                "on_release": lambda y_val=val, y_text=text: self.set_year(y_val, y_text),
+            } for val, text in years
+        ]
+        self.year_menu = MDDropdownMenu(
+            caller=self.ids.btn_year,
+            items=menu_items,
+            width=dp(180),
+        )
+        self.year_menu.open()
+
+    def set_year(self, val, text):
+        self.selected_year = val
+        self.ids.btn_year.text = text
+        if self.year_menu:
+            self.year_menu.dismiss()
+        self.load_ledger()
+
     def load_ledger(self):
         container = self.ids.table_container
         container.clear_widgets()
@@ -372,7 +670,7 @@ class BukuBesarScreen(MDScreen):
             ("Kredit", dp(17)),
             ("Saldo", dp(18))
         ]
-        rows = database.get_buku_besar(self.selected_code)
+        rows = database.get_buku_besar(self.selected_code, self.selected_month, self.selected_year)
         
         table = MDDataTable(
             use_pagination=True,
@@ -385,7 +683,69 @@ class BukuBesarScreen(MDScreen):
 
 
 class NeracaSaldoScreen(MDScreen):
+    selected_month = "Semua"
+    selected_year = "Semua"
+    month_menu = None
+    year_menu = None
+
     def on_enter(self):
+        self.load_neraca()
+
+    def open_month_menu(self):
+        months = [
+            ("Semua", "Semua Bulan"), ("01", "Januari"), ("02", "Februari"), ("03", "Maret"),
+            ("04", "April"), ("05", "Mei"), ("06", "Juni"), ("07", "Juli"),
+            ("08", "Agustus"), ("09", "September"), ("10", "Oktober"), ("11", "November"),
+            ("12", "Desember")
+        ]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": text,
+                "on_release": lambda m_val=val, m_text=text: self.set_month(m_val, m_text),
+            } for val, text in months
+        ]
+        self.month_menu = MDDropdownMenu(
+            caller=self.ids.btn_month,
+            items=menu_items,
+            width=dp(180),
+        )
+        self.month_menu.open()
+
+    def set_month(self, val, text):
+        self.selected_month = val
+        self.ids.btn_month.text = text
+        if self.month_menu:
+            self.month_menu.dismiss()
+        self.load_neraca()
+
+    def open_year_menu(self):
+        years = [
+            ("Semua", "Semua Tahun"), ("2026", "2026"), ("2027", "2027"),
+            ("2028", "2028"), ("2029", "2029")
+        ]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": text,
+                "on_release": lambda y_val=val, y_text=text: self.set_year(y_val, y_text),
+            } for val, text in years
+        ]
+        self.year_menu = MDDropdownMenu(
+            caller=self.ids.btn_year,
+            items=menu_items,
+            width=dp(180),
+        )
+        self.year_menu.open()
+
+    def set_year(self, val, text):
+        self.selected_year = val
+        self.ids.btn_year.text = text
+        if self.year_menu:
+            self.year_menu.dismiss()
+        self.load_neraca()
+
+    def load_neraca(self):
         container = self.ids.table_container
         container.clear_widgets()
         
@@ -395,7 +755,7 @@ class NeracaSaldoScreen(MDScreen):
             ("Debit", dp(20)),
             ("Kredit", dp(20))
         ]
-        rows, total_debit, total_kredit = database.get_neraca_saldo()
+        rows, total_debit, total_kredit = database.get_neraca_saldo(self.selected_month, self.selected_year)
         
         table = MDDataTable(
             use_pagination=False,
@@ -417,11 +777,84 @@ class NeracaSaldoScreen(MDScreen):
 
 
 class LabaRugiScreen(MDScreen):
+    selected_month = "Semua"
+    selected_year = "Semua"
+    month_menu = None
+    year_menu = None
+
     def on_enter(self):
-        data = database.get_laba_rugi()
+        self.load_laba_rugi()
+
+    def open_month_menu(self):
+        months = [
+            ("Semua", "Semua Bulan"), ("01", "Januari"), ("02", "Februari"), ("03", "Maret"),
+            ("04", "April"), ("05", "Mei"), ("06", "Juni"), ("07", "Juli"),
+            ("08", "Agustus"), ("09", "September"), ("10", "Oktober"), ("11", "November"),
+            ("12", "Desember")
+        ]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": text,
+                "on_release": lambda m_val=val, m_text=text: self.set_month(m_val, m_text),
+            } for val, text in months
+        ]
+        self.month_menu = MDDropdownMenu(
+            caller=self.ids.btn_month,
+            items=menu_items,
+            width=dp(180),
+        )
+        self.month_menu.open()
+
+    def set_month(self, val, text):
+        self.selected_month = val
+        self.ids.btn_month.text = text
+        if self.month_menu:
+            self.month_menu.dismiss()
+        self.load_laba_rugi()
+
+    def open_year_menu(self):
+        years = [
+            ("Semua", "Semua Tahun"), ("2026", "2026"), ("2027", "2027"),
+            ("2028", "2028"), ("2029", "2029")
+        ]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": text,
+                "on_release": lambda y_val=val, y_text=text: self.set_year(y_val, y_text),
+            } for val, text in years
+        ]
+        self.year_menu = MDDropdownMenu(
+            caller=self.ids.btn_year,
+            items=menu_items,
+            width=dp(180),
+        )
+        self.year_menu.open()
+
+    def set_year(self, val, text):
+        self.selected_year = val
+        self.ids.btn_year.text = text
+        if self.year_menu:
+            self.year_menu.dismiss()
+        self.load_laba_rugi()
+
+    def load_laba_rugi(self):
+        data = database.get_laba_rugi(self.selected_month, self.selected_year)
         self.ids.lbl_pendapatan.text = f"Rp {data['pendapatan']:,}"
+        
+        self.ids.lbl_hpp_sapi.text = f"Rp {data['hpp_sapi']:,}"
+        self.ids.lbl_beban_transport.text = f"Rp {data['beban_transport']:,}"
+        self.ids.lbl_total_hpp.text = f"Rp {data['total_hpp']:,}"
+        
+        laba_kotor = data['pendapatan'] - data['total_hpp']
+        self.ids.lbl_laba_kotor.text = f"Rp {laba_kotor:,}"
+        
         self.ids.lbl_beban_pakan.text = f"Rp {data['beban_pakan']:,}"
         self.ids.lbl_beban_kesehatan.text = f"Rp {data['beban_kesehatan']:,}"
+        self.ids.lbl_beban_gaji.text = f"Rp {data['beban_gaji']:,}"
+        self.ids.lbl_beban_listrik.text = f"Rp {data['beban_listrik']:,}"
+        self.ids.lbl_beban_penyusutan.text = f"Rp {data['beban_penyusutan']:,}"
         self.ids.lbl_beban_lain.text = f"Rp {data['beban_lain']:,}"
         self.ids.lbl_total_beban.text = f"Rp {data['total_beban']:,}"
         

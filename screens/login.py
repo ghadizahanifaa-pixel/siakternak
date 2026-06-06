@@ -74,6 +74,13 @@ KV = '''
                 elevation: 2
                 on_release: app.verify_login()
 
+            MDFlatButton:
+                text: "KEMBALI KE PORTAL UTAMA"
+                theme_text_color: "Custom"
+                text_color: 0.12, 0.45, 0.12, 1
+                pos_hint: {"center_x": 0.5}
+                on_release: app.back_to_landing()
+
             MDLabel:
                 id: error_label
                 text: ""
