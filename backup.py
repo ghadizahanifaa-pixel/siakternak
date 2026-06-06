@@ -156,13 +156,6 @@ KV = '''
                 theme_text_color: "Custom"
                 text_color: 0.5, 0.5, 0.5, 1
 
-            MDLabel:
-                text: "Default: admin / admin123"
-                halign: "center"
-                font_style: "Caption"
-                theme_text_color: "Custom"
-                text_color: 0.5, 0.5, 0.5, 1
-
 <MainScreen>:
     BoxLayout:
         orientation: 'vertical'
