@@ -23,7 +23,7 @@ def init_db():
     conn = sqlite3.connect('siakternak.db')
     c = conn.cursor()
 
-    # Tabel untuk transaksi
+    # Tabel untuk transaksii
     c.execute('''CREATE TABLE IF NOT EXISTS transaksi 
                  (id INTEGER PRIMARY KEY AUTOINCREMENT, 
                   jenis TEXT, kategori TEXT, jumlah INTEGER, 
