@@ -73,6 +73,8 @@ KV = '''
                         
                         MDIcon:
                             icon: "card-account-details-outline"
+                            size_hint: None, None
+                            size: dp(30), dp(30)
                             pos_hint: {"center_y": 0.5}
                             theme_text_color: "Custom"
                             text_color: 0.12, 0.45, 0.12, 1
@@ -81,18 +83,27 @@ KV = '''
                             orientation: 'vertical'
                             padding: ["12dp", "0dp", "0dp", "0dp"]
                             pos_hint: {"center_y": 0.5}
+                            size_hint_y: None
+                            height: self.minimum_height
                             MDLabel:
                                 text: "Daftar Akun (COA)"
                                 bold: True
                                 font_style: "Subtitle1"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                             MDLabel:
                                 text: "Bagan akun & penggolongan aset, beban, pendapatan"
                                 font_style: "Caption"
                                 theme_text_color: "Secondary"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                         MDIcon:
                             icon: "chevron-right"
+                            size_hint: None, None
+                            size: dp(24), dp(24)
                             pos_hint: {"center_y": 0.5}
                             theme_text_color: "Secondary"
+                            font_size: "24sp"
                     
                     # 2. 2-Column Grid Layout for the other 4 cards
                     MDGridLayout:
@@ -104,8 +115,8 @@ KV = '''
                         # Jurnal Umum Card
                         MDCard:
                             orientation: 'vertical'
-                            padding: "12dp"
-                            spacing: "6dp"
+                            padding: "16dp"
+                            spacing: "4dp"
                             radius: 16
                             elevation: 1
                             ripple_behavior: True
@@ -114,6 +125,8 @@ KV = '''
                             
                             MDIcon:
                                 icon: "book-open-variant"
+                                size_hint: None, None
+                                size: dp(30), dp(30)
                                 theme_text_color: "Custom"
                                 text_color: 0.12, 0.45, 0.12, 1
                                 font_size: "26sp"
@@ -121,16 +134,20 @@ KV = '''
                                 text: "Jurnal Umum"
                                 bold: True
                                 font_style: "Subtitle2"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                             MDLabel:
                                 text: "Double-entry kronologis"
                                 font_style: "Caption"
                                 theme_text_color: "Secondary"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                                 
                         # Buku Besar Card
                         MDCard:
                             orientation: 'vertical'
-                            padding: "12dp"
-                            spacing: "6dp"
+                            padding: "16dp"
+                            spacing: "4dp"
                             radius: 16
                             elevation: 1
                             ripple_behavior: True
@@ -139,6 +156,8 @@ KV = '''
                             
                             MDIcon:
                                 icon: "notebook-outline"
+                                size_hint: None, None
+                                size: dp(30), dp(30)
                                 theme_text_color: "Custom"
                                 text_color: 0.12, 0.45, 0.12, 1
                                 font_size: "26sp"
@@ -146,16 +165,20 @@ KV = '''
                                 text: "Buku Besar"
                                 bold: True
                                 font_style: "Subtitle2"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                             MDLabel:
                                 text: "Mutasi saldo per akun"
                                 font_style: "Caption"
                                 theme_text_color: "Secondary"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                                 
                         # Neraca Saldo Card
                         MDCard:
                             orientation: 'vertical'
-                            padding: "12dp"
-                            spacing: "6dp"
+                            padding: "16dp"
+                            spacing: "4dp"
                             radius: 16
                             elevation: 1
                             ripple_behavior: True
@@ -164,6 +187,8 @@ KV = '''
                             
                             MDIcon:
                                 icon: "scale-balance"
+                                size_hint: None, None
+                                size: dp(30), dp(30)
                                 theme_text_color: "Custom"
                                 text_color: 0.12, 0.45, 0.12, 1
                                 font_size: "26sp"
@@ -171,16 +196,20 @@ KV = '''
                                 text: "Neraca Saldo"
                                 bold: True
                                 font_style: "Subtitle2"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                             MDLabel:
                                 text: "Uji keseimbangan D/K"
                                 font_style: "Caption"
                                 theme_text_color: "Secondary"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                                 
                         # Laba Rugi Card
                         MDCard:
                             orientation: 'vertical'
-                            padding: "12dp"
-                            spacing: "6dp"
+                            padding: "16dp"
+                            spacing: "4dp"
                             radius: 16
                             elevation: 1
                             ripple_behavior: True
@@ -188,7 +217,9 @@ KV = '''
                             md_bg_color: 1, 1, 1, 1
                             
                             MDIcon:
-                                icon: "chart-finance"
+                                icon: "finance"
+                                size_hint: None, None
+                                size: dp(30), dp(30)
                                 theme_text_color: "Custom"
                                 text_color: 0.12, 0.45, 0.12, 1
                                 font_size: "26sp"
@@ -196,10 +227,14 @@ KV = '''
                                 text: "Laba Rugi"
                                 bold: True
                                 font_style: "Subtitle2"
+                                size_hint_y: None
+                                height: self.texture_size[1]
                             MDLabel:
                                 text: "Ikhtisar hasil laba bersih"
                                 font_style: "Caption"
                                 theme_text_color: "Secondary"
+                                size_hint_y: None
+                                height: self.texture_size[1]
 
         # Simulated Javascript/SPA Loading Screen overlay
         MDBoxLayout:

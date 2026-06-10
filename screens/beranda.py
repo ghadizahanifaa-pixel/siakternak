@@ -35,15 +35,21 @@ KV = '''
                 padding: "16dp"
                 spacing: "16dp"
 
-                # Estimasi Laba Card
                 MDCard:
                     size_hint_y: None
                     height: "120dp"
                     padding: "16dp"
                     radius: 20
                     md_bg_color: 0.12, 0.45, 0.12, 1
-                    orientation: 'vertical'
                     elevation: 2
+                    orientation: 'vertical'
+                    canvas:
+                        Color:
+                            rgba: 0.12, 0.45, 0.12, 1
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [20, ]
                     
                     MDLabel:
                         text: "ESTIMASI LABA BERSIH"
@@ -280,7 +286,7 @@ class BerandaScreen(MDScreen):
             pengeluaran = out_vals[i]
             laba = pemasukan - pengeluaran
             content_text += (
-                f"📅 [b]{month}[/b]\n"
+                f"[b]{month}[/b]\n"
                 f"  • Pemasukan: Rp {pemasukan:,}\n"
                 f"  • Pengeluaran: Rp {pengeluaran:,}\n"
                 f"  • Laba Bersih: [color=1B5E20]Rp {laba:,}[/color]\n\n"

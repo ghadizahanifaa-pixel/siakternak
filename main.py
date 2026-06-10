@@ -172,7 +172,7 @@ class SiakTernakApp(MDApp):
         self.sm.add_widget(self.laba_rugi_screen)
 
         # Set initial screen
-        self.sm.current = 'landing'
+        self.sm.current = 'login'
         return self.sm
 
     def back_to_landing(self):
@@ -216,7 +216,7 @@ class SiakTernakApp(MDApp):
         self.login_screen.ids.error_label.text = ""
         self.logged_in_username = ""
         self.sm.transition.direction = 'right'
-        self.sm.current = 'landing'
+        self.sm.current = 'login'
 
     def on_tab_switch(self, tab_name):
         if not self.main_screen:

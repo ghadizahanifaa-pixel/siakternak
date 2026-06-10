@@ -47,6 +47,13 @@ KV = '''
                     orientation: 'vertical'
                     elevation: 1
                     md_bg_color: 0.12, 0.45, 0.12, 1
+                    canvas:
+                        Color:
+                            rgba: 0.12, 0.45, 0.12, 1
+                        RoundedRectangle:
+                            size: self.size
+                            pos: self.pos
+                            radius: [15, ]
                     MDLabel:
                         text: "STOK SAPI"
                         font_style: "Subtitle2"

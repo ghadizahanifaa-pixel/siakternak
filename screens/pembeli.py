@@ -3,7 +3,7 @@ from kivy.metrics import dp
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.card import MDCard
 from kivymd.uix.boxlayout import MDBoxLayout
-from kivymd.uix.label import MDLabel
+from kivymd.uix.label import MDLabel, MDIcon
 from kivymd.uix.button import MDRaisedButton
 import database
 
@@ -46,8 +46,8 @@ KV_PEMBELI = '''
                     id: list_container
                     orientation: 'vertical'
                     adaptive_height: True
-                    spacing: "12dp"
-                    padding: ["2dp", "2dp", "2dp", "2dp"]
+                    spacing: "16dp"
+                    padding: ["16dp", "8dp", "16dp", "16dp"]
 
         # Simulated Loading overlay
         MDBoxLayout:
@@ -121,43 +121,66 @@ class PembeliScreen(MDScreen):
         order_id, nama, wa, jenis_sapi, jumlah_sapi, keterangan, status, tanggal = order
         
         is_pending = (status == 'Pending')
-        card_height = dp(180) if is_pending else dp(135)
         
         card = MDCard(
             size_hint_y=None,
-            height=card_height,
-            radius=[12, 12, 12, 12],
-            padding=dp(16),
-            spacing=dp(6),
+            adaptive_height=True,
+            radius=[16, 16, 16, 16],
+            padding=[dp(20), dp(16), dp(20), dp(16)],
+            spacing=dp(10),
             orientation='vertical',
             elevation=1,
             md_bg_color=(1, 1, 1, 1)
         )
         
         # Row 1: Name & Date
-        row1 = MDBoxLayout(orientation='horizontal', size_hint_y=None, height=dp(25))
-        lbl_name = MDLabel(text=f"[b]{nama}[/b]", markup=True, font_style="Subtitle1", theme_text_color="Custom", text_color=(0.12, 0.45, 0.12, 1))
-        lbl_date = MDLabel(text=tanggal, halign="right", font_style="Caption", theme_text_color="Secondary")
+        row1 = MDBoxLayout(orientation='horizontal', size_hint_y=None, height=dp(28))
+        lbl_name = MDLabel(
+            text=f"[b]{nama.title()}[/b]", 
+            markup=True, 
+            font_style="Subtitle1", 
+            theme_text_color="Custom", 
+            text_color=(0.12, 0.45, 0.12, 1),
+            valign="middle"
+        )
+        lbl_date = MDLabel(
+            text=tanggal, 
+            halign="right", 
+            font_style="Caption", 
+            theme_text_color="Secondary",
+            valign="middle"
+        )
         row1.add_widget(lbl_name)
         row1.add_widget(lbl_date)
         card.add_widget(row1)
         
         # Row 2: Breed & Qty
         row2 = MDBoxLayout(orientation='horizontal', size_hint_y=None, height=dp(20))
-        lbl_details = MDLabel(text=f"Sapi {jenis_sapi}  •  {jumlah_sapi} Ekor  •  WA: {wa}", font_style="Body2", theme_text_color="Primary")
+        lbl_details = MDLabel(
+            text=f"Sapi {jenis_sapi}  •  [b]{jumlah_sapi} Ekor[/b]  •  WA: {wa}", 
+            markup=True, 
+            font_style="Body2", 
+            theme_text_color="Primary",
+            valign="middle"
+        )
         row2.add_widget(lbl_details)
         card.add_widget(row2)
         
         # Row 3: Notes
         row3 = MDBoxLayout(orientation='horizontal', size_hint_y=None, height=dp(20))
-        lbl_notes = MDLabel(text=f"Catatan: {keterangan or '-'}", font_style="Caption", theme_text_color="Secondary")
+        lbl_notes = MDLabel(
+            text=f"Catatan: [i]{keterangan or '-'}[/i]", 
+            markup=True, 
+            font_style="Caption", 
+            theme_text_color="Secondary",
+            valign="middle"
+        )
         row3.add_widget(lbl_notes)
         card.add_widget(row3)
         
         # Row 4: Status / Actions
-        row4 = MDBoxLayout(orientation='horizontal', size_hint_y=None, height=dp(36), spacing=dp(10))
-        
         if is_pending:
+            row4 = MDBoxLayout(orientation='horizontal', size_hint_y=None, height=dp(36), spacing=dp(12))
             btn_acc = MDRaisedButton(
                 text="ACC (SETUJU)",
                 md_bg_color=(0.12, 0.5, 0.12, 1),
@@ -172,25 +195,39 @@ class PembeliScreen(MDScreen):
             )
             row4.add_widget(btn_acc)
             row4.add_widget(btn_reject)
+            card.add_widget(row4)
         else:
+            row4 = MDBoxLayout(orientation='horizontal', size_hint_y=None, height=dp(24), spacing=dp(6))
             if status == 'Iya':
-                badge_text = "✓ DISETUJUI (ACC)"
+                icon_name = "check-decagram"
+                badge_text = "DISETUJUI (ACC)"
                 badge_color = (0.12, 0.5, 0.12, 1)
             else:
-                badge_text = "✗ DITOLAK"
+                icon_name = "close-circle"
+                badge_text = "DITOLAK"
                 badge_color = (0.8, 0.2, 0.2, 1)
                 
+            status_icon = MDIcon(
+                icon=icon_name,
+                theme_text_color="Custom",
+                text_color=badge_color,
+                font_size="18sp",
+                size_hint_x=None,
+                width=dp(22),
+                pos_hint={"center_y": 0.5}
+            )
             lbl_badge = MDLabel(
                 text=badge_text,
                 bold=True,
                 font_style="Subtitle2",
                 theme_text_color="Custom",
                 text_color=badge_color,
-                halign="left"
+                valign="middle",
+                pos_hint={"center_y": 0.5}
             )
+            row4.add_widget(status_icon)
             row4.add_widget(lbl_badge)
-            
-        card.add_widget(row4)
+            card.add_widget(row4)
         return card
 
     def update_order_status(self, order_id, new_status):
