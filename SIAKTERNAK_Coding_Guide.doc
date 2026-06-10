@@ -1,0 +1,253 @@
+SIAKTERNAK CODING GUIDE
+
+Pendahuluan
+==========
+Dokumen ini menjelaskan secara rinci struktur dan logika modul `database.py` serta alur dasar aplikasi SIAKTERNAK. Dokumentasi ini disusun untuk membantu pengembang memahami fungsi, hubungan tabel, dan proses utama pada sistem manajemen peternakan ini.
+
+1. Ringkasan Proyek
+===================
+Proyek `siakternak` adalah aplikasi desktop berbasis KivyMD yang mengelola:
+- otentikasi pengguna
+- pemasukan penjualan sapi
+- pengeluaran operasional
+- inventaris sapi, pakan, obat
+- pemesanan pembeli
+- laporan akuntansi dasar: COA, jurnal umum, buku besar, neraca saldo, laba rugi
+- ekspor data ke Excel
+
+Semua data disimpan di database SQLite bernama `siakternak.db`.
+
+2. Struktur File Utama
+======================
+Folder utama berisi:
+- `main.py` : entry point aplikasi, menginisialisasi screen manager dan alur login.
+- `database.py` : logika backend, koneksi SQLite, CRUD, sinkronisasi inventaris, laporan akuntansi.
+- `screens/` : modul UI terpisah untuk masing-masing tampilan aplikasi.
+
+3. `main.py` dan Alur Utama
+===========================
+`main.py` bertugas:
+- menginisialisasi `MDScreenManager`
+- memanggil `database.init_db()` saat aplikasi mulai
+- membuat screen untuk landing, login, main dashboard, dan laporan keuangan
+- mengatur navigasi antara landing page, login, dan dashboard utama
+- menangani verifikasi login dan logout
+- membuka dialog manajemen pengguna
+
+Fungsi penting di `main.py`:
+- `build()` : membuat semua screen dan menampilkan landing page
+- `verify_login()` : memvalidasi username dan password, lalu menuju screen utama
+- `logout()` : membersihkan form dan kembali ke landing page
+- `on_tab_switch(tab_name)` : memuat ulang data saat tab dashboard diganti
+
+4. Modul UI di `screens/`
+=========================
+Folder `screens` berisi layar terpisah agar UI modular:
+- `landing.py` : portal awal dan form pemesanan sapi
+- `login.py` : halaman login ke aplikasi
+- `beranda.py` : dashboard ringkasan keuangan dan grafik
+- `data.py` : manajemen data pemasukan / pengeluaran
+- `inventaris.py` : manajemen stok inventaris
+- `keuangan.py` : menu navigasi akuntansi
+- `keuangan_views.py` : tampilan laporan COA, jurnal, buku besar, neraca, laba rugi
+- `pembeli.py` : daftar pesanan pembeli dan persetujuan order
+
+5. `database.py` - Import dan Inisialisasi
+=========================================
+Di bagian atas `database.py`, modul mengimpor:
+- `sqlite3` untuk koneksi database
+- `hashlib` untuk hashing password
+- `datetime` untuk timestamp dan format tanggal
+- `os` untuk path file
+- `openpyxl` untuk menulis file Excel
+- `openpyxl.styles` untuk memberi style header dan format angka
+
+Deklarasi global:
+- `DB_NAME = 'siakternak.db'`
+
+Fungsi `get_connection()` mengembalikan objek koneksi SQLite:
+- `return sqlite3.connect(DB_NAME)`
+
+6. Struktur Tabel Database
+===========================
+`init_db()` membuat tabel utama berikut jika belum ada:
+- `users`
+  - `id`, `username`, `password`, `nama_lengkap`, `created_at`
+- `pemasukan`
+  - `id`, `jumlah_sapi`, `total_harga`, `tanggal`
+- `pengeluaran`
+  - `id`, `produk`, `kategori`, `nominal`, `jumlah`, `tanggal`
+- `inventaris`
+  - `id`, `nama_barang`, `tipe_transaksi`, `jumlah`, `tanggal`, `keterangan`, `pemasukan_id`, `pengeluaran_id`, `pesanan_id`
+- `pesanan`
+  - `id`, `nama`, `wa`, `jenis_sapi`, `jumlah_sapi`, `keterangan`, `status`, `tanggal`
+
+7. Migrasi Skema Dinamis
+=========================
+`init_db()` juga memeriksa kolom yang hilang pada tabel lama menggunakan `PRAGMA table_info()` dan menjalankan `ALTER TABLE` saat perlu.
+- Tambahkan kolom `jumlah` ke tabel `pengeluaran` bila belum ada.
+- Tambahkan kolom `nama_barang` dan `pesanan_id` ke tabel `inventaris` bila belum ada.
+
+Langkah ini membuat aplikasi dapat berkembang tanpa kehilangan data lama.
+
+8. Inisialisasi Data Default
+============================
+Jika tabel `pemasukan` dan `pengeluaran` kosong, `init_db()` menambahkan data dummy contoh. Jika `inventaris` kosong, ia juga menambahkan data dummy inventaris.
+
+Selain itu, fungsi ini memasukkan akun admin default dengan username `admin` dan password `admin123` yang disimpan dalam hash SHA-256.
+
+9. Utilitas Filter Tanggal
+==========================
+Fungsi `is_in_period(date_str, bulan, tahun)`:
+- memeriksa apakah tanggal transaksi cocok dengan filter bulan/tahun
+- menerima nilai `"Semua"` sebagai wildcard
+
+Fungsi `is_before_period(date_str, bulan, tahun)`:
+- memeriksa apakah tanggal transaksi terjadi sebelum periode filter
+- digunakan untuk menghitung saldo awal dan neraca kumulatif
+
+Keduanya mengasumsikan format tanggal `dd/mm/YYYY HH:MM`.
+
+10. User Management
+===================
+Fungsi autentikasi dan manajemen user:
+- `verify_user(username, password)`
+  - hash password dengan SHA-256
+  - memeriksa kecocokan ke database
+- `register_user(username, full_name, password)`
+  - menyimpan user baru dengan password hashed
+  - menangani `IntegrityError` jika username sudah terpakai
+- `change_password(username, new_password)`
+  - memperbarui password pengguna
+- `get_all_users()`
+  - mengambil semua pengguna untuk daftar admin
+- `delete_user(username)`
+  - menghapus user kecuali admin
+
+11. Pemasukan CRUD dan Sinkronisasi Inventaris
+=============================================
+Fungsi `pemasukan` mengelola penjualan sapi dan otomatis menyinkronkan mutasi inventaris:
+- `add_pemasukan(jumlah_sapi, total_harga, tanggal=None)`
+  - menambah baris pemasukan
+  - membuat baris `inventaris` baru dengan `tipe_transaksi='Keluar'`
+  - menyimpan `pemasukan_id` di inventaris untuk referensi
+- `get_all_pemasukan()`
+  - mengambil semua catatan pemasukan terurut terbaru
+- `update_pemasukan(db_id, jumlah_sapi, total_harga)`
+  - memperbarui pemasukan
+  - memperbarui jumlah di inventaris terkait
+- `delete_pemasukan(db_id)`
+  - menghapus pemasukan
+  - menghapus entri inventaris yang terkait
+
+12. Pengeluaran CRUD dan Sinkronisasi Inventaris
+===============================================
+Fungsi pengeluaran mengelola biaya operasional dan inventaris pembelian:
+- `add_pengeluaran(produk, kategori, nominal, jumlah=1, tanggal=None)`
+  - menambah baris pengeluaran
+  - membuat entri `inventaris` baru dengan `tipe_transaksi='Masuk'`
+  - nama barang inventaris mengikuti nilai `produk`
+- `get_all_pengeluaran()`
+  - mengambil semua pengeluaran
+- `update_pengeluaran(db_id, produk, kategori, nominal, jumlah=1)`
+  - memperbarui data pengeluaran
+  - memperbarui `nama_barang` dan `jumlah` di entri inventaris terkait
+- `delete_pengeluaran(db_id)`
+  - menghapus pengeluaran
+  - menghapus entri inventaris terkait
+
+13. Inventaris Manual dan Ringkasan Stok
+=======================================
+Fungsi inventaris manual memungkinkan pencatatan mutasi inventaris yang tidak berasal dari transaksi pemasukan/pengeluaran otomatis.
+- `add_inventaris_manual(nama_barang, tipe_transaksi, jumlah, keterangan, tanggal=None)`
+- `get_all_inventaris()`
+- `update_inventaris_manual(db_id, nama_barang, tipe_transaksi, jumlah, keterangan)`
+- `delete_inventaris_manual(db_id)`
+
+`get_inventory_summary()` menghitung stok:
+- `sapi`: total `Masuk` - `Keluar` untuk `nama_barang='Sapi'`
+- `pakan`: total `Masuk` - `Keluar` untuk nama barang yang mengandung kata `Pakan`
+- `obat`: total `Masuk` - `Keluar` untuk nama barang yang mengandung `Obat`, `Vaksin`, atau `Kesehatan`
+
+14. Ringkasan dan Dashboard
+===========================
+Fungsi ringkasan keuangan dasar:
+- `get_summary()` menghitung total pemasukan, total pengeluaran, dan laba bersih.
+- `get_recent_history(limit=20)` menggabungkan pemasukan dan pengeluaran dalam satu riwayat terurut.
+- `get_monthly_summary(limit=6)` menyiapkan data untuk grafik laporan 6 bulan terakhir.
+
+15. Ekspor Excel dan Formatting
+===============================
+Fungsi `export_to_excel(filepath="Laporan_Siakternak.xlsx")` membuat workbook Excel dengan tiga sheet:
+- `Pemasukan`
+- `Pengeluaran`
+- `Inventaris Ternak`
+
+`style_sheet(ws, header_range, colors)` memberi gaya pada header dan format angka:
+- font putih tebal
+- fill warna berbeda berdasarkan tipe sheet
+- border tipis
+- lebar kolom otomatis
+
+16. Helper Akuntansi dan COA
+===========================
+Fungsi `get_coa()` mendefinisikan daftar akun (Chart of Accounts) untuk aplikasi:
+- akun aset
+- akun pendapatan
+- akun HPP
+- akun beban
+
+Fungsi `map_expense_account(produk, kategori)` menyesuaikan kategori pengeluaran menjadi akun COA yang sesuai.
+
+17. Laporan Akuntansi
+=====================
+Fungsi akuntansi utama:
+- `get_jurnal_umum(bulan="Semua", tahun="Semua")`
+  - membuat entri jurnal umum berdasarkan pemasukan dan pengeluaran
+  - untuk pemasukan, menghasilkan entri Kas, Pendapatan, HPP, dan Persediaan Sapi
+  - untuk pengeluaran, menghasilkan entri Kas dan akun biaya/asset terkait
+- `get_buku_besar(kode_akun, bulan="Semua", tahun="Semua")`
+  - menghitung mutasi debit/kredit dan saldo per akun
+  - mendukung saldo awal berdasarkan periode
+- `get_neraca_saldo(bulan="Semua", tahun="Semua")`
+  - menghitung posisi debit dan kredit per akun
+  - berdasarkan data transaksi dan saldo awal asumsi
+- `get_laba_rugi(bulan="Semua", tahun="Semua")`
+  - menghitung pendapatan, HPP, beban, dan laba bersih
+
+18. Pesanan Pembeli dan Sinkronisasi Inventaris
+==============================================
+Fungsi pesanan menangani pembelian sapi di layar landing:
+- `add_pesanan(nama, wa, jenis_sapi, jumlah_sapi, keterangan, tanggal=None)`
+  - menyimpan pesanan dengan status `Pending`
+- `get_all_pesanan()`
+  - mengambil semua pesanan untuk layar admin
+- `update_status_pesanan(pesanan_id, status)`
+  - saat status berubah ke `Iya`, membuat entri inventaris `Keluar`
+  - saat status berubah ke `Tidak` atau `Pending`, menghapus entri inventaris yang terkait
+
+19. Alur Data Utama Aplikasi
+===========================
+Alur data inti:
+1. Aplikasi mulai dan `database.init_db()` dijalankan.
+2. User membuka aplikasi dari layar `landing`.
+3. User login melalui `login.py`.
+4. Setelah login, `main.py` menampilkan `MainScreen` dengan beberapa tab.
+5. Saat tab diubah, masing-masing screen memuat data terbaru dari `database.py`.
+6. Semua perubahan pemasukan/pengeluaran otomatis disinkronkan ke inventaris.
+7. Laporan akuntansi dibangun dari transaksi yang tersimpan di database.
+8. Ekspor Excel tersedia untuk membuat laporan fisik.
+
+20. Saran Pengembangan
+======================
+Untuk meningkatkan aplikasi, pertimbangkan:
+- memecah `database.py` menjadi modul lebih kecil (misalnya `auth.py`, `finance.py`, `inventory.py`)
+- menyimpan tanggal sebagai tipe standar `YYYY-MM-DD HH:MM` untuk operasi waktu lebih konsisten
+- menambahkan validasi input lebih lengkap
+- memperkenalkan unit test untuk fungsi database
+- menggunakan ORM seperti SQLAlchemy untuk struktur database lebih kuat
+- menambahkan fitur edit pesanan dan log perubahan
+
+Penutup
+=======
+Dokumen ini dapat dijadikan referensi saat mempelajari alur kode `database.py` dan hubungan logika antar modul. Untuk membuat dokumen Word yang lebih baik, file teks ini dapat dibuka menggunakan Microsoft Word atau kompatibel dengan Word processor lain.
