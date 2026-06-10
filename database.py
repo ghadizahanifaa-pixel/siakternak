@@ -7,6 +7,22 @@ from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
 
 DB_NAME = 'siakternak.db'
 
+DEFAULT_COA = [
+    ("101", "Kas & Bank", "Aset"),
+    ("102", "Persediaan Sapi Bakalan", "Aset"),
+    ("103", "Persediaan Pakan", "Aset"),
+    ("104", "Persediaan Obat", "Aset"),
+    ("401", "Pendapatan Penjualan Sapi", "Pendapatan"),
+    ("501", "Harga Pokok Penjualan Sapi", "HPP"),
+    ("502", "Beban Transportasi Pembelian", "HPP"),
+    ("601", "Beban Pakan", "Beban"),
+    ("602", "Beban Kesehatan Ternak", "Beban"),
+    ("603", "Beban Gaji", "Beban"),
+    ("604", "Beban Listrik & Air Kandang", "Beban"),
+    ("605", "Beban Penyusutan Kandang & Alat", "Beban"),
+    ("606", "Beban Operasional Lainnya", "Beban")
+]
+
 def get_connection():
     return sqlite3.connect(DB_NAME)
 
@@ -59,6 +75,13 @@ def init_db():
                   status TEXT DEFAULT 'Pending',
                   tanggal TEXT)''')
 
+    # Table for COA (Chart of Accounts)
+    c.execute('''CREATE TABLE IF NOT EXISTS coa 
+                 (id INTEGER PRIMARY KEY AUTOINCREMENT, 
+                  code TEXT UNIQUE, 
+                  name TEXT, 
+                  classification TEXT)''')
+
     # Dynamic migrations
     c.execute("PRAGMA table_info(pengeluaran)")
     cols_pengeluaran = [col[1] for col in c.fetchall()]
@@ -88,7 +111,12 @@ def init_db():
     has_pemasukan = c.fetchone()[0] > 0
     c.execute("SELECT COUNT(*) FROM pengeluaran")
     has_pengeluaran = c.fetchone()[0] > 0
+    c.execute("SELECT COUNT(*) FROM coa")
+    has_coa = c.fetchone()[0] > 0
     
+    if not has_coa:
+        c.executemany("INSERT INTO coa (code, name, classification) VALUES (?,?,?)", DEFAULT_COA)
+
     if not has_pemasukan and not has_pengeluaran:
         # Insert Pemasukan dummy
         pemasukan_dummies = [
@@ -558,21 +586,26 @@ def style_sheet(ws, header_range, colors):
 
 # --- ACCOUNTING MODULE HELPERS (WITH PERIOD FILTERS) ---
 def get_coa():
-    return [
-        ("101", "Kas & Bank", "Aset"),
-        ("102", "Persediaan Sapi Bakalan", "Aset"),
-        ("103", "Persediaan Pakan", "Aset"),
-        ("104", "Persediaan Obat", "Aset"),
-        ("401", "Pendapatan Penjualan Sapi", "Pendapatan"),
-        ("501", "Harga Pokok Penjualan Sapi", "HPP"),
-        ("502", "Beban Transportasi Pembelian", "HPP"),
-        ("601", "Beban Pakan", "Beban"),
-        ("602", "Beban Kesehatan Ternak", "Beban"),
-        ("603", "Beban Gaji", "Beban"),
-        ("604", "Beban Listrik & Air Kandang", "Beban"),
-        ("605", "Beban Penyusutan Kandang & Alat", "Beban"),
-        ("606", "Beban Operasional Lainnya", "Beban")
-    ]
+    conn = get_connection()
+    c = conn.cursor()
+    c.execute("SELECT code, name, classification FROM coa ORDER BY code")
+    rows = c.fetchall()
+    conn.close()
+    return rows
+
+
+def add_coa_account(code, name, classification):
+    conn = get_connection()
+    c = conn.cursor()
+    try:
+        c.execute("INSERT INTO coa (code, name, classification) VALUES (?,?,?)", (code, name, classification))
+        conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+    finally:
+        conn.close()
+
 
 def map_expense_account(produk, kategori):
     cat_lower = kategori.lower()

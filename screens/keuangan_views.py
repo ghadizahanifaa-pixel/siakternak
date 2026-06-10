@@ -3,7 +3,10 @@ from kivy.metrics import dp
 from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.datatables import MDDataTable
+from kivymd.uix.dialog import MDDialog
+from kivymd.uix.button import MDFlatButton, MDRaisedButton
 from kivymd.uix.menu import MDDropdownMenu
+from kivymd.uix.textfield import MDTextField
 import database
 
 KV_VIEWS = '''
@@ -18,6 +21,20 @@ KV_VIEWS = '''
             elevation: 4
             left_action_items: [["arrow-left", lambda x: app.back_to_main()]]
             
+        MDBoxLayout:
+            size_hint_y: None
+            height: "50dp"
+            padding: ["16dp", "8dp", "16dp", "8dp"]
+            spacing: "10dp"
+            MDRaisedButton:
+                text: "Tambah Akun"
+                md_bg_color: 0.12, 0.45, 0.12, 1
+                on_release: root.open_add_account_dialog()
+            MDRaisedButton:
+                text: "Segarkan"
+                md_bg_color: 0.12, 0.45, 0.12, 1
+                on_release: root.on_enter()
+
         MDBoxLayout:
             id: table_container
             orientation: 'vertical'
@@ -468,7 +485,12 @@ KV_VIEWS = '''
 Builder.load_string(KV_VIEWS)
 
 class DaftarAkunScreen(MDScreen):
+    dialog = None
+
     def on_enter(self):
+        self.load_coa_table()
+
+    def load_coa_table(self):
         container = self.ids.table_container
         container.clear_widgets()
         column_data = [
@@ -485,6 +507,48 @@ class DaftarAkunScreen(MDScreen):
             elevation=0
         )
         container.add_widget(table)
+
+    def open_add_account_dialog(self):
+        self.add_code_field = MDTextField(hint_text="Kode Akun", mode="rectangle")
+        self.add_name_field = MDTextField(hint_text="Nama Akun", mode="rectangle")
+        self.add_classification_field = MDTextField(hint_text="Klasifikasi (Aset, Beban, Pendapatan, HPP)", mode="rectangle")
+
+        content = BoxLayout(orientation='vertical', spacing='12dp', padding='12dp')
+        content.add_widget(self.add_code_field)
+        content.add_widget(self.add_name_field)
+        content.add_widget(self.add_classification_field)
+
+        self.dialog = MDDialog(
+            title="Tambah Akun Baru",
+            type="custom",
+            content_cls=content,
+            buttons=[
+                MDFlatButton(text="BATAL", on_release=lambda x: self.dialog.dismiss()),
+                MDRaisedButton(text="SIMPAN", md_bg_color=(0.12, 0.45, 0.12, 1), on_release=self.save_new_account)
+            ]
+        )
+        self.dialog.open()
+
+    def save_new_account(self, *args):
+        code = self.add_code_field.text.strip()
+        name = self.add_name_field.text.strip()
+        classification = self.add_classification_field.text.strip()
+
+        if not code or not name or not classification:
+            self.add_code_field.error = not bool(code)
+            self.add_name_field.error = not bool(name)
+            self.add_classification_field.error = not bool(classification)
+            return
+
+        success = database.add_coa_account(code, name, classification)
+        if not success:
+            self.add_code_field.error = True
+            self.add_code_field.helper_text = "Kode akun sudah ada"
+            self.add_code_field.helper_text_mode = "on"
+            return
+
+        self.dialog.dismiss()
+        self.load_coa_table()
 
 
 class JurnalUmumScreen(MDScreen):
