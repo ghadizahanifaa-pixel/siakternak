@@ -4,7 +4,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivymd.uix.screen import MDScreen
 from kivymd.uix.datatables import MDDataTable
 from kivymd.uix.dialog import MDDialog
-from kivymd.uix.button import MDFlatButton, MDRaisedButton
+from kivymd.uix.button import MDFlatButton, MDRaisedButton, MDFillRoundFlatIconButton
 from kivymd.uix.menu import MDDropdownMenu
 from kivymd.uix.textfield import MDTextField
 import database
@@ -26,13 +26,23 @@ KV_VIEWS = '''
             height: "50dp"
             padding: ["16dp", "8dp", "16dp", "8dp"]
             spacing: "10dp"
-            MDRaisedButton:
+            MDFillRoundFlatIconButton:
                 text: "Tambah Akun"
+                icon: "plus"
                 md_bg_color: 0.12, 0.45, 0.12, 1
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                theme_icon_color: "Custom"
+                icon_color: 1, 1, 1, 1
                 on_release: root.open_add_account_dialog()
-            MDRaisedButton:
+            MDFillRoundFlatIconButton:
                 text: "Segarkan"
+                icon: "refresh"
                 md_bg_color: 0.12, 0.45, 0.12, 1
+                theme_text_color: "Custom"
+                text_color: 1, 1, 1, 1
+                theme_icon_color: "Custom"
+                icon_color: 1, 1, 1, 1
                 on_release: root.on_enter()
 
         MDBoxLayout:
@@ -509,35 +519,82 @@ class DaftarAkunScreen(MDScreen):
         container.add_widget(table)
 
     def open_add_account_dialog(self):
-        self.add_code_field = MDTextField(hint_text="Kode Akun", mode="rectangle")
-        self.add_name_field = MDTextField(hint_text="Nama Akun", mode="rectangle")
-        self.add_classification_field = MDTextField(hint_text="Klasifikasi (Aset, Beban, Pendapatan, HPP)", mode="rectangle")
+        self.selected_classification = "Aset"
+        
+        self.add_code_field = MDTextField(
+            hint_text="Kode Akun",
+            mode="rectangle",
+            line_color_focus=(0.12, 0.45, 0.12, 1),
+            hint_text_color_focus=(0.12, 0.45, 0.12, 1)
+        )
+        self.add_name_field = MDTextField(
+            hint_text="Nama Akun",
+            mode="rectangle",
+            line_color_focus=(0.12, 0.45, 0.12, 1),
+            hint_text_color_focus=(0.12, 0.45, 0.12, 1)
+        )
+        
+        self.btn_select_class = MDRaisedButton(
+            text="Klasifikasi: Aset",
+            md_bg_color=(0.12, 0.45, 0.12, 1),
+            size_hint_x=None,
+            width=dp(180),
+            pos_hint={"x": 0},
+            on_release=self.open_classification_menu
+        )
 
-        content = BoxLayout(orientation='vertical', spacing='12dp', padding='12dp')
+        content = BoxLayout(
+            orientation='vertical',
+            size_hint_y=None,
+            height=dp(220),
+            spacing='16dp',
+            padding=['12dp', '12dp', '12dp', '12dp']
+        )
         content.add_widget(self.add_code_field)
         content.add_widget(self.add_name_field)
-        content.add_widget(self.add_classification_field)
+        content.add_widget(self.btn_select_class)
 
         self.dialog = MDDialog(
             title="Tambah Akun Baru",
             type="custom",
             content_cls=content,
             buttons=[
-                MDFlatButton(text="BATAL", on_release=lambda x: self.dialog.dismiss()),
+                MDFlatButton(text="BATAL", text_color=(0.12, 0.45, 0.12, 1), on_release=lambda x: self.dialog.dismiss()),
                 MDRaisedButton(text="SIMPAN", md_bg_color=(0.12, 0.45, 0.12, 1), on_release=self.save_new_account)
             ]
         )
         self.dialog.open()
 
+    def open_classification_menu(self, button):
+        classes = ["Aset", "Liabilitas", "Ekuitas", "Pendapatan", "HPP", "Beban"]
+        menu_items = [
+            {
+                "viewclass": "OneLineListItem",
+                "text": cls_name,
+                "on_release": lambda x=cls_name: self.set_selected_classification(x),
+            } for cls_name in classes
+        ]
+        self.class_menu = MDDropdownMenu(
+            caller=button,
+            items=menu_items,
+            width=dp(220),
+        )
+        self.class_menu.open()
+
+    def set_selected_classification(self, cls_name):
+        self.selected_classification = cls_name
+        self.btn_select_class.text = f"Klasifikasi: {cls_name}"
+        if hasattr(self, 'class_menu') and self.class_menu:
+            self.class_menu.dismiss()
+
     def save_new_account(self, *args):
         code = self.add_code_field.text.strip()
         name = self.add_name_field.text.strip()
-        classification = self.add_classification_field.text.strip()
+        classification = self.selected_classification
 
-        if not code or not name or not classification:
+        if not code or not name:
             self.add_code_field.error = not bool(code)
             self.add_name_field.error = not bool(name)
-            self.add_classification_field.error = not bool(classification)
             return
 
         success = database.add_coa_account(code, name, classification)
